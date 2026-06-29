@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hesap Bilgileri</title>
+    <title>Güvenli Erişim</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -24,6 +24,29 @@
             width: 100%;
         }
         h2 { color: #333; margin-bottom: 20px; }
+        input[type="password"] {
+            width: 85%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+            text-align: center;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.2s;
+            width: 90%;
+            margin-top: 10px;
+        }
+        button:hover { background-color: #0056b3; }
+        .hidden-content { display: none; }
         .info-box {
             background-color: #e9ecef;
             padding: 12px;
@@ -34,18 +57,8 @@
             margin-top: 10px;
             word-break: break-all;
         }
-        .copy-btn { 
-            background-color: #28a745; 
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background 0.2s;
-            width: 90%;
-            margin-top: 15px;
-        }
+        .error { color: #dc3545; margin-top: 10px; font-size: 14px; font-weight: bold; }
+        .copy-btn { background-color: #28a745; }
         .copy-btn:hover { background-color: #218838; }
         .label { font-size: 14px; color: #666; margin-top: 15px; display: block; text-align: left; font-weight: bold;}
     </style>
@@ -53,21 +66,58 @@
 <body>
 
 <div class="container">
-    <h2>Hesap Bilgileri</h2>
-    
-    <span class="label">Alıcı Adı:</span>
-    <div class="info-box" id="recipient-text">Kadir Karagül</div> <span class="label">IBAN:</span>
-    <div class="info-box" id="iban-text">TR96 0001 5001 5800 7346 2306 49</div> <button class="copy-btn" onclick="copyText()">IBAN Kopyala</button>
+    <div id="login-form">
+        <h2>Güvenli Erişim</h2>
+        <p style="color: #666; font-size: 14px;">Lütfen içeriği görüntülemek için şifreyi giriniz.</p>
+        <input type="password" id="password" placeholder="Şifre">
+        <br>
+        <button onclick="verifyPassword()">Giriş Yap</button>
+        <p id="error-msg" class="error"></p>
+    </div>
+
+    <div id="secure-content" class="hidden-content">
+        <h2>Hesap Bilgileri</h2>
+        
+        <span class="label">Alıcı Adı:</span>
+        <div class="info-box" id="recipient-text"></div>
+        
+        <span class="label">IBAN:</span>
+        <div class="info-box" id="iban-text"></div>
+        <button class="copy-btn" onclick="copyText('iban-text')">IBAN Kopyala</button>
+    </div>
 </div>
 
 <script>
-    function copyText() {
-        const text = document.getElementById('iban-text').innerText;
+    // --- BİLGİLERİNİ SADECE BU ARALIKTAKİ ALANLARA YAZMAN YETERLİ ---
+    
+    const GERCEK_SIFRE     = "253425"; // BURAYI DEĞİŞTİR (Giriş şifreniz)
+    const ALICI_ADI        = "Kadir Karagül"; // BURAYI DEĞİŞTİR
+    const GERCEK_IBAN      = "TR96 0001 5001 5800 7346 2306 49"; // BURAYI DEĞİŞTİR
+    
+    // ------------------------------------------------------------
+
+    function verifyPassword() {
+        const input = document.getElementById('password').value;
         
-        // Hem iPhone hem Android hem de PC'de sorunsuz çalışan kopyalama sistemi
+        if (input === GERCEK_SIFRE) {
+            // Bilgileri doğrudan DOM'a aktarıyoruz
+            document.getElementById('recipient-text').innerText = ALICI_ADI;
+            document.getElementById('iban-text').innerText = GERCEK_IBAN;
+
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('secure-content').style.display = 'block';
+        } else {
+            document.getElementById('error-msg').innerText = "Hatalı şifre girdiniz!";
+        }
+    }
+
+    function copyText(elementId) {
+        const text = document.getElementById(elementId).innerText;
+        
+        // Mobil tarayıcılarda en kararlı çalışan kopyalama alternatifi
         if (navigator.clipboard && window.isSecureContext) {
             navigator.clipboard.writeText(text).then(() => {
-                alert("IBAN başarıyla kopyalandı!");
+                alert("Kopyalandı!");
             }).catch(() => {
                 fallbackCopy(text);
             });
@@ -85,9 +135,9 @@
         textArea.select();
         try {
             document.execCommand('copy');
-            alert("IBAN başarıyla kopyalandı!");
+            alert("Kopyalandı!");
         } catch (err) {
-            alert("Kopyalanamadı, lütfen ekrandan seçerek kopyalayın.");
+            alert("Kopyalanamadı, lütfen elle seçip kopyalayın.");
         }
         document.body.removeChild(textArea);
     }
