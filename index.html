@@ -90,24 +90,37 @@
 <script>
     // --- BİLGİLERİNİ SADECE AŞAĞIDAKİ ALANLARA YAZMAN YETERLİ ---
     
-    const GERCEK_SIFRE     = "1234"; // BURAYI DEĞİŞTİR (Giriş şifreniz).
-    const ALICI_ADI        = "Selman Yıldız"; // BURAYI DEĞİŞTİR
-    const GERCEK_IBAN      = "TR45 0001 0090 1081 1822 7050 01"; // BURAYI DEĞİŞTİR
+    const GERCEK_SIFRE     = "1234"; // BURAYI DEĞİŞTİR (Giriş şifreniz)
+    const ALICI_ADI        = "Ahmet Yılmaz"; // BURAYI DEĞİŞTİR (İstediğin gibi Türkçe yazabilirsin)
+    const GERCEK_IBAN      = "TR00 0000 0000 0000 0000 0000 00"; // BURAYI DEĞİŞTİR
     
     // ------------------------------------------------------------
 
-    // Sayfa koduna dışarıdan bakanların düz metin görmemesi için otomatik maskeleme
+    // Türkçe karakter hatasını önlemek için güvenli maskeleme fonksiyonu
+    function safeEncode(str) {
+        return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function(match, p1) {
+            return String.fromCharCode('0x' + p1);
+        }));
+    }
+
+    // Maskelenmiş veriyi hatasız çözme fonksiyonu
+    function safeDecode(str) {
+        return decodeURIComponent(atob(str).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+    }
+
     const secureData = {
-        name: btoa(unescape(encodeURIComponent(ALICI_ADI))),
-        iban: btoa(GERCEK_IBAN)
+        name: safeEncode(ALICI_ADI),
+        iban: safeEncode(GERCEK_IBAN)
     };
 
     function verifyPassword() {
         const input = document.getElementById('password').value;
         
         if (input === GERCEK_SIFRE) {
-            document.getElementById('recipient-text').innerText = decodeURIComponent(escape(atob(secureData.name)));
-            document.getElementById('iban-text').innerText = atob(secureData.iban);
+            document.getElementById('recipient-text').innerText = safeDecode(secureData.name);
+            document.getElementById('iban-text').innerText = safeDecode(secureData.iban);
 
             document.getElementById('login-form').style.display = 'none';
             document.getElementById('secure-content').style.display = 'block';
@@ -126,3 +139,4 @@
 
 </body>
 </html>
+
