@@ -88,39 +88,21 @@
 </div>
 
 <script>
-    // --- BİLGİLERİNİ SADECE AŞAĞIDAKİ ALANLARA YAZMAN YETERLİ ---
+    // --- BİLGİLERİNİ SADECE BU ARALIKTAKİ ALANLARA YAZMAN YETERLİ ---
     
     const GERCEK_SIFRE     = "1234"; // BURAYI DEĞİŞTİR (Giriş şifreniz)
-    const ALICI_ADI        = "Ahmet Yılmaz"; // BURAYI DEĞİŞTİR (İstediğin gibi Türkçe yazabilirsin)
+    const ALICI_ADI        = "Ahmet Yılmaz"; // BURAYI DEĞİŞTİR
     const GERCEK_IBAN      = "TR00 0000 0000 0000 0000 0000 00"; // BURAYI DEĞİŞTİR
     
     // ------------------------------------------------------------
-
-    // Türkçe karakter hatasını önlemek için güvenli maskeleme fonksiyonu
-    function safeEncode(str) {
-        return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function(match, p1) {
-            return String.fromCharCode('0x' + p1);
-        }));
-    }
-
-    // Maskelenmiş veriyi hatasız çözme fonksiyonu
-    function safeDecode(str) {
-        return decodeURIComponent(atob(str).split('').map(function(c) {
-            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        }).join(''));
-    }
-
-    const secureData = {
-        name: safeEncode(ALICI_ADI),
-        iban: safeEncode(GERCEK_IBAN)
-    };
 
     function verifyPassword() {
         const input = document.getElementById('password').value;
         
         if (input === GERCEK_SIFRE) {
-            document.getElementById('recipient-text').innerText = safeDecode(secureData.name);
-            document.getElementById('iban-text').innerText = safeDecode(secureData.iban);
+            // Bilgileri doğrudan DOM'a aktarıyoruz
+            document.getElementById('recipient-text').innerText = ALICI_ADI;
+            document.getElementById('iban-text').innerText = GERCEK_IBAN;
 
             document.getElementById('login-form').style.display = 'none';
             document.getElementById('secure-content').style.display = 'block';
@@ -131,12 +113,35 @@
 
     function copyText(elementId) {
         const text = document.getElementById(elementId).innerText;
-        navigator.clipboard.writeText(text).then(() => {
+        
+        // Mobil tarayıcılarda en kararlı çalışan kopyalama alternatifi
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Kopyalandı!");
+            }).catch(() => {
+                fallbackCopy(text);
+            });
+        } else {
+            fallbackCopy(text);
+        }
+    }
+
+    function fallbackCopy(text) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed"; 
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+            document.execCommand('copy');
             alert("Kopyalandı!");
-        });
+        } catch (err) {
+            alert("Kopyalanamadı, lütfen elle seçip kopyalayın.");
+        }
+        document.body.removeChild(textArea);
     }
 </script>
 
 </body>
 </html>
-
