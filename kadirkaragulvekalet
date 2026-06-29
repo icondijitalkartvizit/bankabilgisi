@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Güvenli Erişim - Vekaletname Bilgileri</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .container { background-color: #ffffff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; max-width: 450px; width: 100%; }
+        h2 { color: #333; margin-bottom: 20px; }
+        input[type="password"] { width: 85%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; text-align: center; }
+        button { background-color: #007bff; color: white; border: none; padding: 12px 25px; border-radius: 6px; cursor: pointer; font-size: 16px; width: 90%; margin-top: 10px; }
+        button:hover { background-color: #0056b3; }
+        .hidden-content { display: none; }
+        .info-box { background-color: #e9ecef; padding: 12px; border-radius: 8px; font-size: 15px; font-weight: bold; color: #495057; margin-top: 5px; word-break: break-all; text-align: left; }
+        .error { color: #dc3545; margin-top: 10px; font-size: 14px; font-weight: bold; }
+        .copy-btn { background-color: #28a745; width: auto; padding: 6px 15px; font-size: 14px; margin-top: 5px; float: right; color: white; border: none; border-radius: 6px; cursor: pointer; }
+        .copy-btn:hover { background-color: #218838; }
+        .label { font-size: 13px; color: #666; margin-top: 15px; display: block; text-align: left; font-weight: bold;}
+        .row { overflow: hidden; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<script>
+    // ============================================================
+    // 👇 SADECE AŞAĞIDAKİ 4 SATIRI KENDİNE GÖRE DEĞİŞTİR 👇
+    // ============================================================
+    const GERCEK_SIFRE   = "253425"; 
+    const AVUKAT_ADI     = "Av. KADİR KARAGÜL"; 
+    const BARO_ADI       = "İstanbul 1.Bolu Barosu"; 
+    const BARO_SICIL_NO  = "96037"; 
+    // ============================================================
+</script>
+
+<div class="container">
+    <div id="login-form">
+        <h2>Güvenli Erişim</h2>
+        <p style="color: #666; font-size: 14px;">Avukat vekaletname bilgilerini görüntülemek için şifreyi giriniz.</p>
+        <input type="password" id="password" placeholder="Şifre">
+        <br>
+        <button onclick="verifyPassword()">Giriş Yap</button>
+        <p id="error-msg" class="error"></p>
+    </div>
+
+    <div id="secure-content" class="hidden-content">
+        <h2>Vekaletname Bilgileri</h2>
+        
+        <div class="row">
+            <span class="label">Avukat Adı Soyadı:</span>
+            <div class="info-box" id="avukat-text"></div>
+            <button class="copy-btn" onclick="copyText('avukat-text')">Kopyala</button>
+        </div>
+
+        <div class="row">
+            <span class="label">Bağlı Olduğu Baro:</span>
+            <div class="info-box" id="baro-text"></div>
+            <button class="copy-btn" onclick="copyText('baro-text')">Kopyala</button>
+        </div>
+        
+        <div class="row">
+            <span class="label">Baro Sicil Numarası:</span>
+            <div class="info-box" id="barosicil-text"></div>
+            <button class="copy-btn" onclick="copyText('barosicil-text')">Kopyala</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function verifyPassword() {
+        const input = document.getElementById('password').value;
+        if (input === GERCEK_SIFRE) {
+            document.getElementById('avukat-text').innerText = AVUKAT_ADI;
+            document.getElementById('baro-text').innerText = BARO_ADI;
+            document.getElementById('barosicil-text').innerText = BARO_SICIL_NO;
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('secure-content').style.display = 'block';
+        } else {
+            document.getElementById('error-msg').innerText = "Hatalı şifre girdiniz!";
+        }
+    }
+
+    function copyText(elementId) {
+        const text = document.getElementById(elementId).innerText;
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(() => { alert("Kopyalandı!"); }).catch(() => { fallbackCopy(text); });
+        } else {
+            fallbackCopy(text);
+        }
+    }
+
+    function fallbackCopy(text) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed"; 
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try { document.execCommand('copy'); alert("Kopyalandı!"); } catch (err) { alert("Kopyalanamadı."); }
+        document.body.removeChild(textArea);
+    }
+</script>
+
+</body>
+</html>
