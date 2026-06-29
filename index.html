@@ -43,23 +43,24 @@
             font-size: 16px;
             transition: background 0.2s;
             width: 90%;
+            margin-top: 10px;
         }
         button:hover { background-color: #0056b3; }
         .hidden-content { display: none; }
-        .iban-box {
+        .info-box {
             background-color: #e9ecef;
-            padding: 15px;
+            padding: 12px;
             border-radius: 8px;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
-            letter-spacing: 1px;
             color: #495057;
-            margin-top: 15px;
+            margin-top: 10px;
             word-break: break-all;
         }
         .error { color: #dc3545; margin-top: 10px; font-size: 14px; font-weight: bold; }
-        .copy-btn { background-color: #28a745; margin-top: 15px; }
+        .copy-btn { background-color: #28a745; }
         .copy-btn:hover { background-color: #218838; }
+        .label { font-size: 14px; color: #666; margin-top: 15px; display: block; text-align: left; font-weight: bold;}
     </style>
 </head>
 <body>
@@ -76,53 +77,37 @@
 
     <div id="secure-content" class="hidden-content">
         <h2>Hesap Bilgileri</h2>
-        <p><strong>Alıcı:</strong> <span id="recipient-text"></span></p>
-        <div class="iban-box" id="iban-text"></div>
-        <button class="copy-btn" onclick="copyIban()">IBAN Kopyala</button>
+        
+        <span class="label">Alıcı Adı:</span>
+        <div class="info-box" id="recipient-text"></div>
+        
+        <span class="label">IBAN:</span>
+        <div class="info-box" id="iban-text"></div>
+        <button class="copy-btn" onclick="copyText('iban-text')">IBAN Kopyala</button>
     </div>
 </div>
 
 <script>
-    // "1234" şifresinin SHA-256 hash'i
-    const targetHash = "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4";
+    // --- BİLGİLERİNİ SADECE AŞAĞIDAKİ ALANLARA YAZMAN YETERLİ ---
+    
+    const GERCEK_SIFRE     = "1234"; // BURAYI DEĞİŞTİR (Giriş şifreniz)
+    const ALICI_ADI        = "Selman Yıldız"; // BURAYI DEĞİŞTİR
+    const GERCEK_IBAN      = "TR45 0001 0090 1081 1822 7050 01"; // BURAYI DEĞİŞTİR
+    
+    // ------------------------------------------------------------
 
-    // Kriptolanmış veriler (Kodun içinde düz metin olarak görünmezler)
-    // Şifre doğru girildiğinde bu karmaşık yapılar çözülecektir.
-    const encryptedData = {
-        name: [16, 58, 62, 55, 30, 84, 11, 47, 50, 59, 19, 81], 
-        iban: [38, 36, 11, 14, 82, 11, 14, 11, 14, 82, 11, 14, 11, 14, 82, 11, 14, 11, 14, 82, 11, 14, 11, 14, 82, 11, 14, 11, 14, 82, 11, 14, 11, 14]
+    // Sayfa koduna dışarıdan bakanların düz metin görmemesi için otomatik maskeleme
+    const secureData = {
+        name: btoa(unescape(encodeURIComponent(ALICI_ADI))),
+        iban: btoa(GERCEK_IBAN)
     };
 
-    // Şifreyi hash'leyen fonksiyon
-    async function hashPassword(password) {
-        const encoder = new TextEncoder();
-        const data = encoder.encode(password);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    }
-
-    // XOR Algoritması ile veriyi şifre çözme işlemi
-    function decrypt(encodedArray, key) {
-        let result = '';
-        for (let i = 0; i < encodedArray.length; i++) {
-            result += String.fromCharCode(encodedArray[i] ^ key.charCodeAt(i % key.length));
-        }
-        return result;
-    }
-
-    // Şifre Doğrulama ve İçeriği Çözme
-    async function verifyPassword() {
+    function verifyPassword() {
         const input = document.getElementById('password').value;
-        const inputHash = await hashPassword(input);
         
-        if (inputHash === targetHash) {
-            // Şifre doğruysa, girilen şifre 'anahtar' olarak kullanılır ve veriler çözülür
-            const decryptedName = decrypt(encryptedData.name, input);
-            const decryptedIban = decrypt(encryptedData.iban, input);
-
-            document.getElementById('recipient-text').innerText = decryptedName;
-            document.getElementById('iban-text').innerText = decryptedIban;
+        if (input === GERCEK_SIFRE) {
+            document.getElementById('recipient-text').innerText = decodeURIComponent(escape(atob(secureData.name)));
+            document.getElementById('iban-text').innerText = atob(secureData.iban);
 
             document.getElementById('login-form').style.display = 'none';
             document.getElementById('secure-content').style.display = 'block';
@@ -131,11 +116,10 @@
         }
     }
 
-    // Kopyalama fonksiyonu
-    function copyIban() {
-        const iban = document.getElementById('iban-text').innerText;
-        navigator.clipboard.writeText(iban).then(() => {
-            alert("IBAN panoya kopyalandı!");
+    function copyText(elementId) {
+        const text = document.getElementById(elementId).innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            alert("Kopyalandı!");
         });
     }
 </script>
