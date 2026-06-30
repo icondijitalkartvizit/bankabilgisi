@@ -5,14 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Güvenli Erişim</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f6;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 120vh;
-            margin: 0;
+            body {
+    display: flex;
+    justify-content: center; /* Yatayda yine tam ortada kalsın */
+    align-items: flex-start; /* Dikey ortalamayı iptal edip en yukarı sabitleyin */
+    
+    padding-top: 15vh;       /* Tüm içeriği ekranın üstünden %15 aşağı kaydırır */
+    
+    background-color: #f4f7f6;
+    min-height: 100vh;       /* height yerine min-height kullanmak daha esnektir */
+    box-sizing: border-box;  /* Eklenen boşluğun taşma yapmasını engeller */
+}
+
         }
         .container {
             background-color: #ffffff;
