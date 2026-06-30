@@ -8,10 +8,12 @@
             body {
     display: flex;
     justify-content: center;
-    align-items: center; /* Sayfayı dikeyde tam ortalayan satır */
+    align-items: center;
     background-color: #f4f7f6;
     height: 100vh;
-    margin: 0; /* Tarayıcının varsayılan boşluklarını sıfırlamak için */
+    margin: 0;
+    /* Sayfadaki tüm yazıları modern ve okunaklı bir fonta dönüştürür: */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 .container {
@@ -31,6 +33,7 @@ input[type="password"] {
     border: 1px solid #ccc;
     border-radius: 6px;
     text-align: center;
+    font-family: inherit; /* Body'deki modern fontu kutunun içine de uygular */
 }
 
 button {
@@ -40,7 +43,10 @@ button {
     border: none;
     border-radius: 6px;
     cursor: pointer;
+    font-family: inherit; /* Body'deki modern fontu butonun içine de uygular */
+    font-weight: 600;     /* Buton yazısını biraz daha belirgin yapar */
 }
+
 
         }
         button:hover { background-color: #0056b3; }
